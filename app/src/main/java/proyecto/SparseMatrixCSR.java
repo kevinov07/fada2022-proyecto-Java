@@ -85,36 +85,45 @@ public class SparseMatrixCSR {
         return column;
     }
 
-    public void setValue(int i, int j, int value) throws OperationNotSupportedException
+    public void setValue(int k, int z, int value) throws OperationNotSupportedException
     {
-        int[][] nMatrix = new int[this.matrix.length][this.matrix[0].length];
-        for (int a = 0; a < this.values.length; a++) {
-            int column = this.columns[a];
-            int row = this.rows[a];
-            nMatrix[row][column] = this.values[a];
-        }
-        nMatrix[i][j] = value;
+        //Se crean representaciones desde cero por medio de ArrayList
         ArrayList<Integer> values = new ArrayList<>();
         ArrayList<Integer> rows = new ArrayList<>();
         ArrayList<Integer> columns = new ArrayList<>();
+        //Es una matrix de arrayList
+        ArrayList<ArrayList<Integer>> nMatrix = new ArrayList<>();
+        //Crea la matriz
+        for (int i = 0; i < this.matrix.length; i++) {
+            nMatrix.add(new ArrayList<>());
+        }
+        //se pasan los valores de la matriz original a la nueva
+        for (int i = 0; i < this.matrix.length; i++) {
+            for (int j = 0; j < this.matrix[i].length; j++) {
+                nMatrix.get(i).add(matrix[i][j]);
+            }
+        }
+        nMatrix.get(k).set(z, value);
+
+        //A partir de aqui se reutiliza la representacion desde 0, pero con  la nueva matriz
         rows.add(0);
         int n = 0;
-        for (int x = 0; x < nMatrix.length; x++) {
+        for (int i = 0; i < nMatrix.size(); i++) {
             int count = 0;
-            for (int y = 0; y < nMatrix[i].length; y++) {
-                if (nMatrix[x][y] != 0) {
-                    values.add(nMatrix[x][y]);
-                    rows.add(x);
-                    columns.add(y);
+            for (int j = 0; j < nMatrix.get(i).size(); j++) {
+                if (nMatrix.get(i).get(j) != 0) {
+                    values.add(nMatrix.get(i).get(j));
+                    columns.add(j);
                     count++;
                 }
             }
             n += count;
             rows.add(n);
         }
-        int[] valores = values.stream().mapToInt(a -> a).toArray();
-        int[] filas = rows.stream().mapToInt(a -> a).toArray();
-        int[] columnas = columns.stream().mapToInt(a -> a).toArray();
+        //Mapeo de arrayList a Array normales
+        int[] valores = values.stream().mapToInt(i -> i).toArray();
+        int[] filas = rows.stream().mapToInt(i -> i).toArray();
+        int[] columnas = columns.stream().mapToInt(i -> i).toArray();
         this.setValues(valores);
         this.setRows(filas);
         this.setColumns(columnas);

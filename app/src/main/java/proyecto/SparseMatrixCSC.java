@@ -86,9 +86,48 @@ public class SparseMatrixCSC {
         return column;
     }
 
-    public void setValue(int i, int j, int value) throws OperationNotSupportedException
+    public void setValue(int k, int z, int value) throws OperationNotSupportedException
     {
-        throw new OperationNotSupportedException();
+        //Se crean representaciones desde cero por medio de ArrayList
+        ArrayList<Integer> values = new ArrayList<>();
+        ArrayList<Integer> rows = new ArrayList<>();
+        ArrayList<Integer> columns = new ArrayList<>();
+        //Es una matrix de arrayList
+        ArrayList<ArrayList<Integer>> nMatrix = new ArrayList<>();
+        //Crea la matriz
+        for (int i = 0; i < this.matrix.length; i++) {
+            nMatrix.add(new ArrayList<>());
+        }
+        //se pasan los valores de la matriz original a la nueva
+        for (int i = 0; i < this.matrix.length; i++) {
+            for (int j = 0; j < this.matrix[i].length; j++) {
+                nMatrix.get(i).add(matrix[i][j]);
+            }
+        }
+        nMatrix.get(k).set(z, value);
+
+        //A partir de aqui se reutiliza la representacion desde 0, pero con  la nueva matriz
+        columns.add(0);
+        int n = 0;
+        for (int j = 0; j < nMatrix.get(0).size(); j++) {
+            int count = 0;
+            for (int i = 0; i < nMatrix.size(); i++) {
+                if (nMatrix.get(i).get(j) != 0) {
+                    values.add(nMatrix.get(i).get(j));
+                    rows.add(i);
+                    count++;
+                }
+            }
+            n += count;
+            columns.add(n);
+        }
+        //Mapeo de arrayList a Array normales
+        int[] valores = values.stream().mapToInt(i -> i).toArray();
+        int[] filas = rows.stream().mapToInt(i -> i).toArray();
+        int[] columnas = columns.stream().mapToInt(i -> i).toArray();
+        this.setValues(valores);
+        this.setRows(filas);
+        this.setColumns(columnas);
     }
 
     /*
@@ -121,9 +160,9 @@ public class SparseMatrixCSC {
         for (int i = 0; i < this.matrix[0].length; i++) {
             traspuesta.add(new ArrayList<>());
         }
-        for (int i = 0; i < this.matrix.length; i++) {
-            for (int j = 0; j < this.matrix[i].length; j++) {
-                traspuesta.get(j).add(matrix[i][j]);
+        for (int[] ints : this.matrix) {
+            for (int j = 0; j < ints.length; j++) {
+                traspuesta.get(j).add(ints[j]);
             }
         }
         columns.add(0);
